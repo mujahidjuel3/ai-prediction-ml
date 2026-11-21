@@ -1,43 +1,54 @@
 # Academic Sentinel ML service
 
-This is a private local FastAPI service. No university data, trained model, training metric, or model artifact is included. The service returns `MODEL_REQUIRED` until a model has been trained from authorized data. Bind Uvicorn to `127.0.0.1`; only the NestJS backend should call prediction endpoints. Set the same random `ML_SERVICE_TOKEN` in the backend and ML process.
+Private FastAPI service for training and inference. **No university dataset or production student risk model is included.**
+
+## Operating modes
+
+| Mode | Purpose | NestJS generation |
+|---|---|---|
+| `synthetic_demo` (default) | Pipeline/integration tests with synthetic fixtures only | Always disabled. Never store/show as student risk. |
+| `validated_model` | University-approved dataset trained and reviewed | Still disabled until Nest gates pass |
+| `production_prediction` | Reserved for approved institutional use | Requires Nest `ML_UNIVERSITY_POLICY_APPROVED` + `ML_PREDICTION_PERSISTENCE_ENABLED` |
+
+Set `ML_OPERATING_MODE` on the ML process. Training writes `operatingMode` / `isSynthetic` / `disclaimer` into artifact metadata.
 
 ## Local Windows setup
 
-Install Python 3.11 or 3.12 from the official Python distribution if `py --version` is unavailable. From this directory:
-
 ```powershell
-py -3.11 -m venv .venv
+py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-$env:ML_SERVICE_TOKEN = 'use-a-random-local-secret-of-your-own'
+$env:ML_SERVICE_TOKEN = 'use-a-random-local-secret-of-at-least-32-chars'
+$env:ML_OPERATING_MODE = 'synthetic_demo'
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Health endpoints: `GET /health/live`, `GET /health/ready`. A ready response with `model_required` is expected until training has completed. `GET /v1/model` and `POST /v1/predict` require `X-ML-Service-Token`.
+Health: `GET /health/live`, `GET /health/ready`. Protected routes require `X-ML-Service-Token`:
 
-## Dataset and target setup
+- `GET /v1/model`
+- `GET /v1/versions`
+- `POST /v1/predict`
 
-Place a locally authorized CSV under `data/` (the folder is git-ignored). Never commit student records. Obtain institutional approval and define a single binary target, the observation cutoff, and prediction lead time before training. Do not combine course failure, low GPA, and dropout into one target. Choose only features available by that cutoff. Exclude identity, final outcome fields, post-cutoff grades/attendance, intervention fields, and any derived leakage columns. Use `--student-column` to keep a student's rows in one split; use `--time-column` for a later-time holdout when the source has a reliable chronological field.
+Bind to loopback / private network only. Only NestJS should call this service.
 
-Synthetic format example (for documentation only; not training data):
-
-```csv
-term_code,attendance_pct,prior_gpa,assessment_avg,failed_course
-TERM-2025-FALL,82,3.10,76,0
-TERM-2025-FALL,54,2.05,43,1
-```
-
-Example command, after replacing column names/target definition with the approved schema:
+## Synthetic training (tests / demo pipeline only)
 
 ```powershell
-python train.py --csv data/university-approved.csv --target failed_course `
-  --target-definition "At least one enrolled course failed by term end; features cut off at week 6, 6-week lead time" `
-  --features attendance_pct,prior_gpa,assessment_avg --positive-label 1 `
-  --student-column student_number --time-column term_index
+python -c "from app.dataset import synthetic_fixture; synthetic_fixture(40).to_csv('data/synthetic-fixture.csv', index=False)"
+python train.py --csv data/synthetic-fixture.csv --target outcome `
+  --target-definition "synthetic fixture fail by term end; features cut off at week 6" `
+  --features attendance,prior_gpa,assessment_avg --positive-label 1 `
+  --student-column student --time-column term --data-mode synthetic_demo
 ```
 
-The trainer checks the target/feature schema, reports missingness, duplicates and label distribution, requires two classes and a minimum data size, performs a reproducible temporal holdout (or student-group/stratified split), fits preprocessing only on training data, compares a prior baseline, Logistic Regression and Random Forest using PR-AUC, and emits test metrics and versioned artifact metadata. Calibration is attempted on training folds and is marked explicitly. Metrics from a synthetic test fixture are not evidence of institutional model quality. Review all data-quality, leakage, calibration, cohort fairness and workload results before enabling the model.
+Artifacts land in `artifacts/` (latest pointers) and `artifacts/versions/<modelVersion>/`. Metrics from synthetic fixtures are **not** institutional model quality evidence.
 
-Artifacts in `artifacts/` and reports in `reports/` are git-ignored. Back up and version approved artifacts only through a separately reviewed secure process. Joblib artifacts are executable serialization: load only artifacts produced by this trusted training workflow.
+## University-approved training
+
+Place an approved local CSV under ignored `data/`. Never commit student records. Obtain approvals for target, cutoff/horizon, features, thresholds, review, and consent before any production claim. Use `--data-mode validated_model` or, only after explicit confirmation, `--data-mode production_prediction --i-confirm-university-approvals`.
+
+## NestJS integration
+
+Backend uses `ML_SERVICE_URL`, `ML_SERVICE_TOKEN`, timeout/retries, and `GET /api/v1/ml/status` (Admin).  
+`POST /api/v1/predictions/generate` remains **HTTP 503** until university policy gates and non-synthetic persistence are explicitly enabled. Prediction rows are stored only through the existing Prisma `ModelVersion` / `Prediction` design when those gates pass in a future step — this service does not write to PostgreSQL itself.
