@@ -1,0 +1,251 @@
+{
+  "modelVersion": "20261126T051120Z-logistic_regression",
+  "algorithm": "logistic_regression",
+  "features": [
+    "attendance",
+    "prior_gpa",
+    "quiz_avg",
+    "midterm",
+    "assignment_avg",
+    "assessment_avg"
+  ],
+  "targetColumn": "outcome",
+  "targetDefinition": "Synthetic binary label: outcome=1 means demo at-risk of course failure within a ~4-week horizon before final assessments. Fixture/synthetic only.",
+  "positiveLabel": "1",
+  "classes": [
+    "0",
+    "1"
+  ],
+  "probabilityCalibrated": true,
+  "split": "temporal_holdout",
+  "trainRows": 160,
+  "testRows": 40,
+  "dataSha256": "e05b45f513acfb67d7664bfbbd92a81683396ba6a16894e5b02a6b15dc8b6a3c",
+  "python": "3.12.10",
+  "scikitLearn": "1.6.1",
+  "seed": 2026,
+  "metrics": {
+    "precision": 0.9523809523809523,
+    "recall": 0.9523809523809523,
+    "f1": 0.9523809523809523,
+    "confusionMatrix": [
+      [
+        18,
+        1
+      ],
+      [
+        1,
+        20
+      ]
+    ],
+    "classificationReport": {
+      "0": {
+        "precision": 0.9473684210526315,
+        "recall": 0.9473684210526315,
+        "f1-score": 0.9473684210526315,
+        "support": 19.0
+      },
+      "1": {
+        "precision": 0.9523809523809523,
+        "recall": 0.9523809523809523,
+        "f1-score": 0.9523809523809523,
+        "support": 21.0
+      },
+      "accuracy": 0.95,
+      "macro avg": {
+        "precision": 0.949874686716792,
+        "recall": 0.949874686716792,
+        "f1-score": 0.949874686716792,
+        "support": 40.0
+      },
+      "weighted avg": {
+        "precision": 0.95,
+        "recall": 0.95,
+        "f1-score": 0.95,
+        "support": 40.0
+      }
+    },
+    "prAuc": 0.9906807060942399,
+    "brierScore": 0.054868536486314054,
+    "rocAuc": 0.9899749373433584
+  },
+  "candidateMetrics": {
+    "dummy_prior": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "confusionMatrix": [
+        [
+          19,
+          0
+        ],
+        [
+          21,
+          0
+        ]
+      ],
+      "classificationReport": {
+        "0": {
+          "precision": 0.475,
+          "recall": 1.0,
+          "f1-score": 0.6440677966101694,
+          "support": 19.0
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 21.0
+        },
+        "accuracy": 0.475,
+        "macro avg": {
+          "precision": 0.2375,
+          "recall": 0.5,
+          "f1-score": 0.3220338983050847,
+          "support": 40.0
+        },
+        "weighted avg": {
+          "precision": 0.22562500000000002,
+          "recall": 0.475,
+          "f1-score": 0.3059322033898305,
+          "support": 40.0
+        }
+      },
+      "prAuc": 0.525,
+      "brierScore": 0.2503515625,
+      "rocAuc": 0.5
+    },
+    "logistic_regression": {
+      "precision": 0.9523809523809523,
+      "recall": 0.9523809523809523,
+      "f1": 0.9523809523809523,
+      "confusionMatrix": [
+        [
+          18,
+          1
+        ],
+        [
+          1,
+          20
+        ]
+      ],
+      "classificationReport": {
+        "0": {
+          "precision": 0.9473684210526315,
+          "recall": 0.9473684210526315,
+          "f1-score": 0.9473684210526315,
+          "support": 19.0
+        },
+        "1": {
+          "precision": 0.9523809523809523,
+          "recall": 0.9523809523809523,
+          "f1-score": 0.9523809523809523,
+          "support": 21.0
+        },
+        "accuracy": 0.95,
+        "macro avg": {
+          "precision": 0.949874686716792,
+          "recall": 0.949874686716792,
+          "f1-score": 0.949874686716792,
+          "support": 40.0
+        },
+        "weighted avg": {
+          "precision": 0.95,
+          "recall": 0.95,
+          "f1-score": 0.95,
+          "support": 40.0
+        }
+      },
+      "prAuc": 0.9906807060942399,
+      "brierScore": 0.04971657486985668,
+      "rocAuc": 0.9899749373433584
+    },
+    "random_forest": {
+      "precision": 0.7916666666666666,
+      "recall": 0.9047619047619048,
+      "f1": 0.8444444444444444,
+      "confusionMatrix": [
+        [
+          14,
+          5
+        ],
+        [
+          2,
+          19
+        ]
+      ],
+      "classificationReport": {
+        "0": {
+          "precision": 0.875,
+          "recall": 0.7368421052631579,
+          "f1-score": 0.8,
+          "support": 19.0
+        },
+        "1": {
+          "precision": 0.7916666666666666,
+          "recall": 0.9047619047619048,
+          "f1-score": 0.8444444444444444,
+          "support": 21.0
+        },
+        "accuracy": 0.825,
+        "macro avg": {
+          "precision": 0.8333333333333333,
+          "recall": 0.8208020050125313,
+          "f1-score": 0.8222222222222222,
+          "support": 40.0
+        },
+        "weighted avg": {
+          "precision": 0.83125,
+          "recall": 0.825,
+          "f1-score": 0.8233333333333335,
+          "support": 40.0
+        }
+      },
+      "prAuc": 0.952892722745664,
+      "brierScore": 0.10470199308633385,
+      "rocAuc": 0.9423558897243107
+    }
+  },
+  "dataQuality": {
+    "rows": 200,
+    "featureColumns": [
+      "attendance",
+      "prior_gpa",
+      "quiz_avg",
+      "midterm",
+      "assignment_avg",
+      "assessment_avg"
+    ],
+    "targetColumn": "outcome",
+    "targetDefinition": "Synthetic binary label: outcome=1 means demo at-risk of course failure within a ~4-week horizon before final assessments. Fixture/synthetic only.",
+    "classes": [
+      "0",
+      "1"
+    ],
+    "positiveLabel": "1",
+    "targetMissing": 0,
+    "missingByColumn": {
+      "attendance": 0,
+      "prior_gpa": 0,
+      "quiz_avg": 0,
+      "midterm": 0,
+      "assignment_avg": 0,
+      "assessment_avg": 0,
+      "outcome": 0
+    },
+    "duplicateRows": 0,
+    "uniqueKey": [
+      "student",
+      "term"
+    ],
+    "labelDistribution": {
+      "0": 100,
+      "1": 100
+    }
+  },
+  "createdAt": "2026-11-26T05:11:20.055792+00:00",
+  "operatingMode": "synthetic_demo",
+  "isSynthetic": true,
+  "disclaimer": "Synthetic demo artifact for pipeline testing only. Not an actual student risk assessment.",
+  "modelSha256": "8ca1b227d14dd0ec3b40dcb360a0501372e1c007130bf49ec752255afaa7aa66"
+}

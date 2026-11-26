@@ -1,14 +1,27 @@
+# Keep image lean and free of secrets. Synthetic demo artifacts/data ARE included.
 .venv
 __pycache__
+**/__pycache__
 *.pyc
 .env
 .env.*
 !.env.example
 !.env.production.example
-artifacts/*
-!artifacts/.gitkeep
-data/*
-!data/.gitkeep
 .git
-*.md
+.github
 .pytest_cache
+*.md
+reports/*
+!reports/.gitkeep
+# Exclude local junk under artifacts/data but keep the synthetic demo bundle.
+artifacts/**
+!artifacts/.gitkeep
+!artifacts/model.joblib
+!artifacts/metadata.json
+!artifacts/versions/
+!artifacts/versions/**
+data/**
+!data/.gitkeep
+!data/README.md
+!data/synthetic_demo.csv
+!data/synthetic_demo.manifest.json

@@ -1,0 +1,22 @@
+{
+  "path": "D:/Project/academic/ai-prediction-ml/data/synthetic_demo.csv",
+  "rows": 200,
+  "seed": 2026,
+  "origin": "SYNTHETIC_DEMO",
+  "disclaimer": "Synthetic academic fixture for Academic Sentinel semester demos only. Not university records. Not validated student risk predictions.",
+  "target": "outcome",
+  "targetDefinition": "Synthetic binary label: outcome=1 means demo at-risk of course failure within a ~4-week horizon before final assessments. Features are attendance, prior_gpa, quiz_avg, midterm, assignment_avg, assessment_avg observed at prediction cutoff. Not an institutional policy threshold.",
+  "features": [
+    "attendance",
+    "prior_gpa",
+    "quiz_avg",
+    "midterm",
+    "assignment_avg",
+    "assessment_avg"
+  ],
+  "positiveLabel": "1",
+  "labelDistribution": {
+    "0": 100,
+    "1": 100
+  }
+}
