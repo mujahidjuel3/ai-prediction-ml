@@ -6,6 +6,8 @@ from app.dataset import DatasetSpec, synthetic_fixture, validate_frame
 def test_synthetic_fixture_is_clearly_labeled_and_valid():
     frame = synthetic_fixture(40)
     assert frame["student"].str.startswith("synthetic-").all()
+    for column in ("quiz_avg", "midterm", "assignment_avg"):
+        assert column in frame.columns
     report = validate_frame(
         frame,
         DatasetSpec(
@@ -20,6 +22,12 @@ def test_synthetic_fixture_is_clearly_labeled_and_valid():
     )
     assert report["rows"] == 40
     assert set(report["classes"]) == {"0", "1"}
+
+
+def test_synthetic_fixture_is_deterministic_for_demo_seed():
+    a = synthetic_fixture(40, seed=2026)
+    b = synthetic_fixture(40, seed=2026)
+    assert a.equals(b)
 
 
 def test_validate_frame_rejects_feature_leakage_columns():

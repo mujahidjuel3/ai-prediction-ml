@@ -67,20 +67,43 @@ def drop_incomplete_targets(frame: pd.DataFrame, target: str) -> pd.DataFrame:
     return frame.loc[frame[target].notna()].reset_index(drop=True)
 
 
-def synthetic_fixture(rows: int = 40) -> pd.DataFrame:
-    """Generate clearly synthetic rows for pipeline tests. Not university data."""
+def synthetic_fixture(rows: int = 40, seed: int = 2026) -> pd.DataFrame:
+    """Generate clearly synthetic rows for pipeline tests and demos. Not university data.
+
+    Target ``outcome`` is binary: 1 = at-risk of failing the next midterm window
+    (synthetic prediction horizon: ~4 weeks before final assessments). Features are
+    observed at cutoff and never include the future outcome itself.
+    """
     import numpy as np
 
     if rows < 20:
         raise ValueError("Synthetic fixtures require at least 20 rows")
+    rng = np.random.default_rng(seed)
+    attendance = rng.uniform(35, 100, size=rows)
+    prior_gpa = rng.uniform(1.2, 4.0, size=rows)
+    quiz_avg = rng.uniform(20, 100, size=rows)
+    midterm = rng.uniform(25, 100, size=rows)
+    assignment_avg = rng.uniform(30, 100, size=rows)
+    assessment_avg = 0.3 * quiz_avg + 0.4 * midterm + 0.3 * assignment_avg
+    # Deterministic risk score → binary label (not institutional policy).
+    risk_score = (
+        (100 - attendance) * 0.35
+        + (4.0 - prior_gpa) * 12.0
+        + (100 - assessment_avg) * 0.25
+        + rng.normal(0, 4, size=rows)
+    )
+    outcome = (risk_score > float(np.median(risk_score))).astype(int)
     half = rows // 2
     return pd.DataFrame(
         {
-            "student": [f"synthetic-{i}" for i in range(rows)],
+            "student": [f"synthetic-{i:04d}" for i in range(rows)],
             "term": ([1] * half) + ([2] * (rows - half)),
-            "attendance": np.linspace(40, 99, rows),
-            "prior_gpa": np.linspace(1.5, 4.0, rows),
-            "assessment_avg": np.linspace(35, 95, rows),
-            "outcome": ([0, 1] * (rows // 2))[:rows],
+            "attendance": np.round(attendance, 2),
+            "prior_gpa": np.round(prior_gpa, 2),
+            "quiz_avg": np.round(quiz_avg, 2),
+            "midterm": np.round(midterm, 2),
+            "assignment_avg": np.round(assignment_avg, 2),
+            "assessment_avg": np.round(assessment_avg, 2),
+            "outcome": outcome,
         }
     )
